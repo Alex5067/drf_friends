@@ -8,10 +8,12 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 
 class UserRegister(APIView):
+    @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request, format=None):
         username = request.query_params.get('username')
         email = request.query_params.get('email')
@@ -43,6 +45,8 @@ class AllUsers(APIView):
 class SendRequestToUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Success",
+                                                                   200: "Такая заявка уже существует",})
     def post(self, request):
         username = request.query_params.get('username')
         friend = User.objects.get(username=username)
@@ -52,16 +56,17 @@ class SendRequestToUser(APIView):
             if reverse_request:
                 reverse_request.accept()
                 reverse_request.delete()
-                return Response("Вы добавили друга")
+                return Response("Вы добавили друга", status.HTTP_201_CREATED)
             else:
                 FriendRequest.objects.create(from_user=request.user, to_user=friend)
-                return Response("Вы отправили заявку в друзья")
+                return Response("Вы отправили заявку в друзья", status.HTTP_201_CREATED)
         else:
-            return Response("Такая заявка уже существует")
+            return Response("Такая заявка уже существует", status.HTTP_200_OK)
 
 class AcceptRequestFromUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Вы добавили username в друзья"})
     def post(self, request):
         username = request.query_params.get('username')
         friend = User.objects.get(username=username)
@@ -69,7 +74,7 @@ class AcceptRequestFromUser(APIView):
         if friend_request:
             friend_request.accept()
             friend_request.delete()
-            return Response(f"Вы добавили {friend} в друзья")
+            return Response(f"Вы добавили {friend} в друзья", status.HTTP_201_CREATED)
 
 class RejectRequestFromUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
