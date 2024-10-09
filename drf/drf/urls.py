@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import permissions
-from friends.views import UserRegister, UserProfile, AllUsers, SendRequestToUser, AcceptRequestFromUser
+from friends.views import (UserRegister, UserProfile, AllUsers, SendRequestToUser, AcceptRequestFromUser,
+                           DeleteFriend, RejectRequestFromUser)
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -45,6 +46,6 @@ urlpatterns = [
     path('all_users/', AllUsers.as_view(), name="all_users"),
     path('send_request_to/', SendRequestToUser.as_view(), name="send_request"),
     path('accept_request_from/', AcceptRequestFromUser.as_view(), name="accept_request"),
-    #path('reject_request_from', ),
-
+    path('reject_request_from/', RejectRequestFromUser.as_view(), name="reject_request"),
+    path('delete_friend/', DeleteFriend.as_view(), name="delete_friend"),
 ]
