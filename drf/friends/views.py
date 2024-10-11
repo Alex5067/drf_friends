@@ -6,6 +6,7 @@ from friends.models import FriendRequest
 from rest_framework import permissions
 from friends.serializers import FriendSerializer, UserSerializer, UserProfileSerializer, AllUsersSerializer
 from django.http import Http404
+from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -14,6 +15,8 @@ from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 
 class UserRegister(APIView):
+    permission_classes = [permissions.AllowAny]
+
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request, format=None):
         username = request.query_params.get('username')
@@ -21,8 +24,13 @@ class UserRegister(APIView):
         password = request.query_params.get('password')
         serializer = UserSerializer(data={'email': email, 'password': password, 'username': username})
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status.HTTP_201_CREATED)
+            user = serializer.save()
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                'username': user.username,
+                'email': user.email,
+                'token': token.key
+            }, status.HTTP_201_CREATED)
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
