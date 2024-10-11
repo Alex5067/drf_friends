@@ -13,7 +13,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FriendRequest
-        fields = ["from_user", "to_user", "timestamp", "status"]
+        fields = ["from_user", "to_user", "timestamp"]
 
     def get_from_user(self, obj):
         return obj.from_user.username
@@ -50,18 +50,6 @@ class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username']
-    '''users = serializers.SerializerMethodField()
-    current_user = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Friend
-        fields = ["users", "current_user"]
-
-    def get_users(self, obj):
-        return UserSerializer(obj.users.all(), many=True).data
-
-    def get_current_user(self, obj):
-        return obj.current_user.username'''
 
 
 class AllUsersSerializer(serializers.ModelSerializer):

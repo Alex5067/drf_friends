@@ -93,7 +93,7 @@ def test_accept_friend_request(api_client, create_user, create_second_user):
     assert len(friends_sent) > 0
     assert send_to.data == f"Вы отправили заявку в друзья пользователю {params['second_username']}"
 
-    # Авторизация testuser2 пользователя и отправка запроса testuser, атоматическое добавление в друзья
+    # Авторизация testuser2 пользователя и принятие запроса testuser
     api_client.login(username=params['second_username'], password='newpassword123')
     profile = api_client.get('/accounts/profile/')
     friends_received = profile.data.get('friend_requests_received', [])
@@ -104,8 +104,7 @@ def test_accept_friend_request(api_client, create_user, create_second_user):
 
     assert accept_from.data == f"Вы добавили {params['username']} в друзья"
 
-    # Проверка на то, что при взаимной отправке друг другу запросов,
-    # пользователи автоматически добавляются друг другу в друзья
+    # Проверка на то, что при принятии запроса, происходит добавление в друзья
     profile = api_client.get('/accounts/profile/')
     friends = profile.data.get('friends', [])
     friend_usernames = [friend['username'] for friend in friends]
@@ -139,7 +138,6 @@ def test_reject_friend_request(api_client, create_user, create_second_user):
     friend_request_data = profile.data.get('friend_requests_received')
     assert len(friend_request_data) < 1
 
-
 def test_delete_friend(api_client, create_user, create_second_user):
     # Пользователи
     params = {'username': 'testuser', 'second_username': 'testuser2'}
@@ -147,7 +145,7 @@ def test_delete_friend(api_client, create_user, create_second_user):
     # Авторизация testuser пользователя и отправка запроса testuser2
     api_client.login(username=params['username'], password='password123')
     api_client.post('/send_request_to/', data={}, **{'QUERY_STRING': f"username={params['second_username']}"})
-    # Авторизация testuser2 пользователя и отправка запроса testuser, атоматическое добавление в друзья
+    # Авторизация testuser2 пользователя и принятие запроса testuser
     api_client.login(username=params['second_username'], password='newpassword123')
     api_client.post('/accept_request_from/', data={}, **{'QUERY_STRING': f"username={params['username']}"})
 
@@ -162,3 +160,27 @@ def test_delete_friend(api_client, create_user, create_second_user):
     profile = api_client.get('/accounts/profile/')
     friends = profile.data.get('friends')
     assert len(friends) < 1
+
+def test_auto_add_to_friend(api_client, create_user, create_second_user):
+    # Пользователи
+    params = {'username': 'testuser', 'second_username': 'testuser2'}
+
+    # Авторизация testuser пользователя и отправка запроса testuser2
+    api_client.login(username=params['username'], password='password123')
+    api_client.post('/send_request_to/', data={}, **{'QUERY_STRING': f"username={params['second_username']}"})
+    # Авторизация testuser2 пользователя и отправка запроса testuser, атоматическое добавление в друзья
+    api_client.login(username=params['second_username'], password='newpassword123')
+    api_client.post('/send_request_to/', data={}, **{'QUERY_STRING': f"username={params['username']}"})
+    # Проверка на автоматическое добавление в друзья, если 2 пользователи отправили друг другу заявки
+    profile = api_client.get('/accounts/profile/')
+    friends = profile.data.get('friends')
+    friends_request = profile.data.get('friend_requests_sent')
+    assert len(friends_request) < 1
+    assert len(friends) > 0
+
+    api_client.login(username=params['username'], password='password123')
+    profile = api_client.get('/accounts/profile/')
+    friends = profile.data.get('friends')
+    friends_request = profile.data.get('friend_requests_sent')
+    assert len(friends_request) < 1
+    assert len(friends) > 0
