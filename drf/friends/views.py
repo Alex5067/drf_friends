@@ -1,11 +1,9 @@
-from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
 from friends.models import Friend, User
 from friends.models import FriendRequest
 from rest_framework import permissions
 from friends.serializers import FriendSerializer, UserSerializer, UserProfileSerializer, AllUsersSerializer
-from django.http import Http404
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -19,9 +17,9 @@ class UserRegister(APIView):
 
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request, format=None):
-        username = request.query_params.get('username')
-        email = request.query_params.get('email')
-        password = request.query_params.get('password')
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
         serializer = UserSerializer(data={'email': email, 'password': password, 'username': username})
         if serializer.is_valid():
             user = serializer.save()
@@ -57,7 +55,7 @@ class SendRequestToUser(APIView):
     @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Success",
                                                                    200: "Такая заявка уже существует",})
     def post(self, request):
-        username = request.query_params.get('username')
+        username = request.data.get('username')
 
         try:
             friend = User.objects.get(username=username)
@@ -85,7 +83,7 @@ class AcceptRequestFromUser(APIView):
 
     @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Вы добавили username в друзья"})
     def post(self, request):
-        username = request.query_params.get('username')
+        username = request.data.get('username')
 
         try:
             friend = User.objects.get(username=username)
@@ -105,7 +103,7 @@ class RejectRequestFromUser(APIView):
     @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Вы отклонили заявку username в друзья",
                                                                    400: "User or request doesn't exist"})
     def post(self, request):
-        username = request.query_params.get('username')
+        username = request.data.get('username')
 
         try:
             friend = User.objects.get(username=username)
@@ -125,7 +123,7 @@ class DeleteFriend(APIView):
                                                                    400: "User doesn't exist or not a friend "
                                                                         "or user is yourself"})
     def post(self, request):
-        username = request.query_params.get('username')
+        username = request.data.get('username')
         current_user = request.user
 
         try:
