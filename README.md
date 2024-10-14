@@ -11,20 +11,16 @@ git clone <URL-репозитория>
 cd <название-проекта>
 ```
 
-### 2. Установка зависимостей
+### 2. Запуск сервера
 
 #### Через pip:
 
 ```bash
 pip install -r requirements.txt
-```
-
-### 3. Запуск сервера
-
-#### Через pip:
-
-```bash
-python manage.py runserver
+python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py runserver 0.0.0.0:8000
 ```
 
 #### Через Docker:
@@ -33,7 +29,7 @@ python manage.py runserver
 docker-compose up -d
 ```
 
-### 6. Доступ к API
+### 3. Доступ к API
 
 После запуска сервер будет доступен по адресу: `http://127.0.0.1:8000/`
 
