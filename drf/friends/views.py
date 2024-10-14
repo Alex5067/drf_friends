@@ -127,9 +127,8 @@ class AcceptRequestFromUser(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),
-                'token': openapi.Schema(type=openapi.TYPE_STRING, description='Токен пользователя'),},
-            required=['username', 'token']), responses={201: "Вы добавили username в друзья"},
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),},
+            required=['username']), responses={201: "Вы добавили username в друзья"},
         manual_parameters=[
             openapi.Parameter(
                 'Authorization',
