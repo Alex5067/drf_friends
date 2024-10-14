@@ -85,7 +85,7 @@ class SendRequestToUser(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),},
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
             required=['username']),
         manual_parameters=[
             openapi.Parameter(
@@ -95,7 +95,7 @@ class SendRequestToUser(APIView):
                 type=openapi.TYPE_STRING
             )
         ],
-        responses={201: "Success", 200: "Такая заявка уже существует",})
+        responses={201: "Success", 200: "Такая заявка уже существует", })
     def post(self, request):
         username = request.data.get('username')
 
@@ -127,7 +127,7 @@ class AcceptRequestFromUser(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),},
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
             required=['username']), responses={201: "Вы добавили username в друзья"},
         manual_parameters=[
             openapi.Parameter(
@@ -159,7 +159,7 @@ class RejectRequestFromUser(APIView):
     @swagger_auto_schema(request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),},
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
             required=['username']),
         manual_parameters=[
             openapi.Parameter(
@@ -191,7 +191,7 @@ class DeleteFriend(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),},
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
             required=['username',]), responses={201: "Вы удалили username из друзей",
                                                 400: "User doesn't exist or not a friend or user is yourself"},
         manual_parameters=[
