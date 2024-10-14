@@ -7,6 +7,7 @@ from friends.serializers import FriendSerializer, UserSerializer, UserProfileSer
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from drf_yasg import openapi
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 
@@ -52,8 +53,14 @@ class AllUsers(APIView):
 class SendRequestToUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Success",
-                                                                   200: "Такая заявка уже существует",})
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),
+                'token': openapi.Schema(type=openapi.TYPE_STRING, description='Токен пользователя'),},
+            required=['username', 'token']),
+        responses={201: "Success", 200: "Такая заявка уже существует",})
     def post(self, request):
         username = request.data.get('username')
 
@@ -81,7 +88,12 @@ class SendRequestToUser(APIView):
 class AcceptRequestFromUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Вы добавили username в друзья"})
+    @swagger_auto_schema(request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),
+                'token': openapi.Schema(type=openapi.TYPE_STRING, description='Токен пользователя'),},
+            required=['username', 'token']), responses={201: "Вы добавили username в друзья"})
     def post(self, request):
         username = request.data.get('username')
 
@@ -100,7 +112,12 @@ class AcceptRequestFromUser(APIView):
 class RejectRequestFromUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Вы отклонили заявку username в друзья",
+    @swagger_auto_schema(request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),
+                'token': openapi.Schema(type=openapi.TYPE_STRING, description='Токен пользователя'),},
+            required=['username', 'token']), responses={201: "Вы отклонили заявку username в друзья",
                                                                    400: "User or request doesn't exist"})
     def post(self, request):
         username = request.data.get('username')
@@ -119,7 +136,12 @@ class RejectRequestFromUser(APIView):
 class DeleteFriend(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(request_body=FriendSerializer, responses={201: "Вы удалили username из друзей",
+    @swagger_auto_schema(request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'),
+                'token': openapi.Schema(type=openapi.TYPE_STRING, description='Токен пользователя'),},
+            required=['username', 'token']), responses={201: "Вы удалили username из друзей",
                                                                    400: "User doesn't exist or not a friend "
                                                                         "or user is yourself"})
     def post(self, request):
