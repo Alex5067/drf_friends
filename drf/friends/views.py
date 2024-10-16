@@ -1,5 +1,4 @@
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import generics
 from friends.models import Friend, User
 from friends.models import FriendRequest
 from rest_framework import permissions
@@ -8,10 +7,29 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_yasg import openapi
+from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
+
+class Greetings(APIView):
+    permission_classes = [permissions.AllowAny]
+    renderer_classes = [StaticHTMLRenderer]
+
+    def get(self, request):
+        body = (
+            "<html>"
+            "<body style='padding: 10px;'>"
+            "<h1>Welcome to the API</h1>"
+            "<div>"
+            "Check <a href='/swagger'>swagger</a>"
+            " or <a href='/redoc'>redoc</a>"
+            "</div>"
+            "</body>"
+            "</html>"
+        )
+        return Response(body)
 
 class UserRegister(APIView):
     permission_classes = [permissions.AllowAny]
