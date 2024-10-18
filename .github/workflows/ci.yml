@@ -32,10 +32,10 @@ jobs:
       run: black . --line-length 120
 
     - name: Run linters (flake8)
-      run: flake8 
+      run: flake8 . --line-length 120
 
     - name: Sort imports (isort)
-      run: isort --check-only .
+      run: isort .
 
     - name: Run tests (pytest)
       run: pytest
