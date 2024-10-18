@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -117,10 +118,7 @@ class SendRequestToUser(APIView):
     def post(self, request):
         username = request.data.get("username")
 
-        try:
-            friend = User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            return Response(f"Пользователя с никнеймом {username} не существует", status.HTTP_400_BAD_REQUEST)
+        friend = get_object_or_404(User, username=username)
 
         friend_request = FriendRequest.objects.filter(from_user=request.user, to_user=friend).first()
         if request.user == friend:
@@ -163,10 +161,7 @@ class AcceptRequestFromUser(APIView):
     def post(self, request):
         username = request.data.get("username")
 
-        try:
-            friend = User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            return Response(f"Пользователя с никнеймом {username} не существует", status.HTTP_400_BAD_REQUEST)
+        friend = get_object_or_404(User, username=username)
 
         friend_request = FriendRequest.objects.filter(from_user=friend, to_user=request.user).first()
         if friend_request:
@@ -200,10 +195,7 @@ class RejectRequestFromUser(APIView):
     def post(self, request):
         username = request.data.get("username")
 
-        try:
-            friend = User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            return Response(f"Пользователя с никнеймом {username} не существует", status.HTTP_400_BAD_REQUEST)
+        friend = get_object_or_404(User, username=username)
 
         friend_request = FriendRequest.objects.filter(from_user=friend, to_user=request.user).first()
         if friend_request:
@@ -239,10 +231,7 @@ class DeleteFriend(APIView):
         username = request.data.get("username")
         current_user = request.user
 
-        try:
-            friend_to_lose = User.objects.get(username=username)
-        except ObjectDoesNotExist:
-            return Response(f"Пользователя с никнеймом {username} не существует", status.HTTP_400_BAD_REQUEST)
+        friend_to_lose = get_object_or_404(User, username=username)
 
         if username == str(current_user):
             return Response(f'{"Нельзя удалить самого себя из друзей"}', status.HTTP_400_BAD_REQUEST)
