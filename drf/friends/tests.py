@@ -1,6 +1,7 @@
 import pytest
-from friends.serializers import UserSerializer
 from rest_framework.test import APIClient
+
+from friends.serializers import UserSerializer
 
 
 # Create your tests here.

@@ -1,8 +1,8 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
-from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 
 from .models import Friend, FriendRequest
