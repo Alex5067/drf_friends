@@ -32,7 +32,7 @@ jobs:
       run: black . --line-length 120
 
     - name: Run linters (flake8)
-      run: flake8 . --line-length 120
+      run: flake8 . --max-line-length 120
 
     - name: Sort imports (isort)
       run: isort .
