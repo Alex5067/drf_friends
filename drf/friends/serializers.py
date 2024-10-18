@@ -7,6 +7,7 @@ from rest_framework.validators import UniqueValidator
 
 from .models import Friend, FriendRequest
 
+
 class FriendRequestSerializer(serializers.ModelSerializer):
     from_user = serializers.SerializerMethodField()
     to_user = serializers.SerializerMethodField()
@@ -21,26 +22,25 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     def get_to_user(self, obj):
         return obj.to_user.username
 
+
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all(), message="Username is already taken")]
+        required=True, validators=[UniqueValidator(queryset=User.objects.all(), message="Username is already taken")]
     )
     email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all(), message="Email is already in use")]
+        required=True, validators=[UniqueValidator(queryset=User.objects.all(), message="Email is already in use")]
     )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ["username", "email", "password"]
 
     def create(self, validated_data):
         user = User(
-            email=validated_data['email'],
-            username=validated_data['username'],
+            email=validated_data["email"],
+            username=validated_data["username"],
         )
-        user.set_password(validated_data['password'])  # Хэшируем пароль
+        user.set_password(validated_data["password"])  # Хэшируем пароль
         user.save()
         return user
 
@@ -49,13 +49,14 @@ class FriendSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username']
+        fields = ["username"]
 
 
 class AllUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username']
+        fields = ["username"]
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     friends = serializers.SerializerMethodField()
@@ -65,10 +66,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'friends', 'friend_requests_sent', 'friend_requests_received', 'token']
+        fields = ["username", "email", "friends", "friend_requests_sent", "friend_requests_received", "token"]
 
     def get_friends(self, obj):
-        friends = Friend.objects.filter(current_user=obj).prefetch_related('users')
+        friends = Friend.objects.filter(current_user=obj).prefetch_related("users")
         return FriendSerializer(friends.first().users.all(), many=True).data if friends.exists() else []
 
     def get_friend_requests_sent(self, obj):

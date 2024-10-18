@@ -13,6 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 # Create your views here.
 
+
 class Greetings(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [StaticHTMLRenderer]
@@ -31,23 +32,22 @@ class Greetings(APIView):
         )
         return Response(body)
 
+
 class UserRegister(APIView):
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request, format=None):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
-        serializer = UserSerializer(data={'email': email, 'password': password, 'username': username})
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+        serializer = UserSerializer(data={"email": email, "password": password, "username": username})
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
-            return Response({
-                'username': user.username,
-                'email': user.email,
-                'token': token.key
-            }, status.HTTP_201_CREATED)
+            return Response(
+                {"username": user.username, "email": user.email, "token": token.key}, status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
@@ -57,21 +57,19 @@ class UserProfile(APIView):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                'Authorization',
+                "Authorization",
                 openapi.IN_HEADER,
                 description="Токен пользователя (формат: Token <ключ>)",
-                type=openapi.TYPE_STRING
+                type=openapi.TYPE_STRING,
             )
         ],
-        responses={
-            200: "Username\nemail\ntoken",
-            401: "Authentication credentials were not provided"
-        }
+        responses={200: "Username\nemail\ntoken", 401: "Authentication credentials were not provided"},
     )
     def get(self, request, format=None):
         user = request.user
         serializer = UserProfileSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class AllUsers(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -79,22 +77,20 @@ class AllUsers(APIView):
     @swagger_auto_schema(
         manual_parameters=[
             openapi.Parameter(
-                'Authorization',
+                "Authorization",
                 openapi.IN_HEADER,
                 description="Токен пользователя (формат: Token <ключ>)",
-                type=openapi.TYPE_STRING
+                type=openapi.TYPE_STRING,
             )
         ],
-        responses={
-            200: "Success",
-            401: "Authentication credentials were not provided"
-        }
+        responses={200: "Success", 401: "Authentication credentials were not provided"},
     )
     def get(self, request, format=None):
         current_user = request.user
         users = User.objects.exclude(id=current_user.id)
         serializer = AllUsersSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class SendRequestToUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -103,19 +99,25 @@ class SendRequestToUser(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
-            required=['username']),
+                "username": openapi.Schema(type=openapi.TYPE_STRING, description="Имя пользователя"),
+            },
+            required=["username"],
+        ),
         manual_parameters=[
             openapi.Parameter(
-                'Authorization',
+                "Authorization",
                 openapi.IN_HEADER,
                 description="Токен пользователя (формат: Token <ключ>)",
-                type=openapi.TYPE_STRING
+                type=openapi.TYPE_STRING,
             )
         ],
-        responses={201: "Success", 200: "Такая заявка уже существует", })
+        responses={
+            201: "Success",
+            200: "Такая заявка уже существует",
+        },
+    )
     def post(self, request):
-        username = request.data.get('username')
+        username = request.data.get("username")
 
         try:
             friend = User.objects.get(username=username)
@@ -138,6 +140,7 @@ class SendRequestToUser(APIView):
         else:
             return Response("Такая заявка уже существует", status.HTTP_200_OK)
 
+
 class AcceptRequestFromUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -145,19 +148,22 @@ class AcceptRequestFromUser(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
-            required=['username']), responses={201: "Вы добавили username в друзья"},
+                "username": openapi.Schema(type=openapi.TYPE_STRING, description="Имя пользователя"),
+            },
+            required=["username"],
+        ),
+        responses={201: "Вы добавили username в друзья"},
         manual_parameters=[
             openapi.Parameter(
-                'Authorization',
+                "Authorization",
                 openapi.IN_HEADER,
                 description="Токен пользователя (формат: Token <ключ>)",
-                type=openapi.TYPE_STRING
-                )
-            ],
-        )
+                type=openapi.TYPE_STRING,
+            )
+        ],
+    )
     def post(self, request):
-        username = request.data.get('username')
+        username = request.data.get("username")
 
         try:
             friend = User.objects.get(username=username)
@@ -171,25 +177,30 @@ class AcceptRequestFromUser(APIView):
             return Response(f"Вы добавили {friend} в друзья", status.HTTP_201_CREATED)
         return Response(f"Не удалось принять запрос в друзья от {username}", status.HTTP_400_BAD_REQUEST)
 
+
 class RejectRequestFromUser(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(request_body=openapi.Schema(
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
-            required=['username']),
+                "username": openapi.Schema(type=openapi.TYPE_STRING, description="Имя пользователя"),
+            },
+            required=["username"],
+        ),
         manual_parameters=[
             openapi.Parameter(
-                'Authorization',
+                "Authorization",
                 openapi.IN_HEADER,
                 description="Токен пользователя (формат: Token <ключ>)",
-                type=openapi.TYPE_STRING
+                type=openapi.TYPE_STRING,
             )
         ],
-        responses={201: "Вы отклонили заявку username в друзья", 400: "User or request doesn't exist"})
+        responses={201: "Вы отклонили заявку username в друзья", 400: "User or request doesn't exist"},
+    )
     def post(self, request):
-        username = request.data.get('username')
+        username = request.data.get("username")
 
         try:
             friend = User.objects.get(username=username)
@@ -202,6 +213,7 @@ class RejectRequestFromUser(APIView):
             return Response(f"Вы отклонили заявку в друзья от {friend}", status.HTTP_201_CREATED)
         return Response(f"Не удалось отклонить запрос от {username}", status.HTTP_400_BAD_REQUEST)
 
+
 class DeleteFriend(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -209,20 +221,24 @@ class DeleteFriend(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Имя пользователя'), },
-            required=['username',]), responses={201: "Вы удалили username из друзей",
-                                                400: "User doesn't exist or not a friend or user is yourself"},
+                "username": openapi.Schema(type=openapi.TYPE_STRING, description="Имя пользователя"),
+            },
+            required=[
+                "username",
+            ],
+        ),
+        responses={201: "Вы удалили username из друзей", 400: "User doesn't exist or not a friend or user is yourself"},
         manual_parameters=[
             openapi.Parameter(
-                'Authorization',
+                "Authorization",
                 openapi.IN_HEADER,
                 description="Токен пользователя (формат: Token <ключ>)",
-                type=openapi.TYPE_STRING
-                )
-            ],
-        )
+                type=openapi.TYPE_STRING,
+            )
+        ],
+    )
     def post(self, request):
-        username = request.data.get('username')
+        username = request.data.get("username")
         current_user = request.user
 
         try:
@@ -231,7 +247,7 @@ class DeleteFriend(APIView):
             return Response(f"Пользователя с никнеймом {username} не существует", status.HTTP_400_BAD_REQUEST)
 
         if username == str(current_user):
-            return Response(f"Нельзя удалить самого себя из друзей", status.HTTP_400_BAD_REQUEST)
+            return Response(f'{"Нельзя удалить самого себя из друзей"}', status.HTTP_400_BAD_REQUEST)
 
         friend_relation = Friend.objects.filter(current_user=current_user, users=friend_to_lose)
         if not friend_relation.exists():

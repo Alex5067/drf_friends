@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 # Create your models here.
 class FriendRequest(models.Model):
-    from_user = models.ForeignKey(User, related_name='friend_requests_sent', on_delete=models.CASCADE)
-    to_user = models.ForeignKey(User, related_name='friend_requests_received', on_delete=models.CASCADE)
+    from_user = models.ForeignKey(User, related_name="friend_requests_sent", on_delete=models.CASCADE)
+    to_user = models.ForeignKey(User, related_name="friend_requests_received", on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def accept(self):
@@ -19,13 +20,12 @@ class FriendRequest(models.Model):
         # Удаляем заявку
         super().delete()
 
+
 class Friend(models.Model):
     users = models.ManyToManyField(User)
-    current_user = models.ForeignKey(User, related_name='owner', null=True, on_delete=models.CASCADE)
+    current_user = models.ForeignKey(User, related_name="owner", null=True, on_delete=models.CASCADE)
 
     @classmethod
     def lose_friend(cls, current_user, new_friend):
-        friend, created = cls.objects.get_or_create(
-            current_user=current_user
-        )
+        friend, created = cls.objects.get_or_create(current_user=current_user)
         friend.users.remove(new_friend)
