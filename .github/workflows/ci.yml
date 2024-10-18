@@ -31,11 +31,11 @@ jobs:
     - name: Check code formatting (black)
       run: black . --line-length 120
 
-    - name: Run linters (flake8)
-      run: flake8 . --max-line-length 120
-
     - name: Sort imports (isort)
       run: isort .
+
+    - name: Run linters (flake8)
+      run: flake8 . --max-line-length 120
 
     - name: Run tests (pytest)
       run: pytest
