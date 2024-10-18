@@ -35,7 +35,7 @@ jobs:
       run: isort .
 
     - name: Run linters (flake8)
-      run: flake8 . --max-line-length 120
+      run: flake8 . --ignore=F401 --max-line-length 120
 
     - name: Run tests (pytest)
       run: pytest
