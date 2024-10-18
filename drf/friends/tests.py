@@ -4,9 +4,6 @@ from rest_framework.test import APIClient
 import django
 import os
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "drf.settings")
-django.setup()
-
 
 # Create your tests here.
 @pytest.fixture
