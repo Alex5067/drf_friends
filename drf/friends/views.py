@@ -2,7 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from friends.models import Friend, FriendRequest, User
-from friends.serializers import AllUsersSerializer, FriendSerializer, UserProfileSerializer, UserSerializer
+from friends.serializers import (AllUsersSerializer, FriendSerializer,
+                                 UserProfileSerializer, UserSerializer)
 from rest_framework import permissions, status
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import StaticHTMLRenderer
