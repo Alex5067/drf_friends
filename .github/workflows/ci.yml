@@ -29,10 +29,10 @@ jobs:
         pip install -r requirements.txt
         
     - name: Check code formatting (black)
-      run: black . --line-length 120
+      run: black . --line-length 120 --check
 
     - name: Sort imports (isort)
-      run: isort .
+      run: isort --check-only .
 
     - name: Run linters (flake8)
       run: flake8 . --ignore=F401 --max-line-length 120
