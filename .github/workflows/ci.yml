@@ -35,4 +35,6 @@ jobs:
       run: flake8 . --ignore=F401 --max-line-length 120
 
     - name: Run tests (pytest)
-      run: pytest drf
+      run: |
+        export DJANGO_SETTINGS_MODULE=drf.settings
+        pytest drf
