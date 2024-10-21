@@ -34,6 +34,7 @@ python manage.py runserver 0.0.0.0:8000
 #### Через Docker:
 
 ```bash
+cd drf
 docker-compose up -d
 ```
 
