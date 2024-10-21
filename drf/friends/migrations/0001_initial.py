@@ -17,7 +17,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Friend",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 (
                     "current_user",
                     models.ForeignKey(
@@ -33,7 +41,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="FriendRequest",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("timestamp", models.DateTimeField(auto_now_add=True)),
                 ("status", models.BooleanField(default=False)),
                 (
