@@ -4,8 +4,29 @@ from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 
+User = get_user_model()
+
 
 # Create your tests here.
+
+
+@pytest.fixture
+def user_data():
+    """
+    Фикстура для создания тестовых данных пользователя.
+
+    Возвращает словарь с данными пользователя, включая
+    имя пользователя, пароль и электронную почту.
+
+    :return: dict - данные пользователя для создания
+    """
+    return {
+        "username": "testuser",
+        "password": "password123",
+        "email": "testuser@example.com",
+    }
+
+
 @pytest.fixture
 def api_client():
     """
@@ -78,7 +99,6 @@ def test_create_token_on_user_creation():
         1. Создание пользователя.
         2. Проверка, что токен существует и его ключ является строкой.
     """
-    User = get_user_model()
 
     user = User.objects.create_user(username="testuser", password="password123")
 
@@ -312,3 +332,50 @@ def test_if_already_friends(api_client, create_user, create_second_user):
     friends_request = profile.data.get("friend_requests_sent")
     assert req.data == f"{params['second_username']} уже у вас в друзьях"
     assert len(friends_request) < 1
+
+
+@pytest.mark.django_db
+def test_create_auth_token_on_user_creation(user_data):
+    """
+    Тест для проверки создания токена аутентификации при создании нового пользователя.
+
+    Этот тест проверяет, что токен не существует до создания
+    пользователя, затем создает нового пользователя и проверяет,
+    что для него был создан токен аутентификации, который правильно
+    ассоциирован с пользователем.
+
+    :param user_data: данные пользователя для создания
+
+    """
+    assert Token.objects.count() == 0, "Token should not exist before user creation"
+
+    user = User.objects.create_user(**user_data)
+
+    token = Token.objects.get(user=user)
+    assert token is not None, "Token should be created for the new user"
+    assert token.user == user, "Token should be associated with the created user"
+
+
+@pytest.mark.django_db
+def test_no_token_on_user_update(user_data):
+    """
+    Тест для проверки, что токен аутентификации не создается
+    при обновлении существующего пользователя.
+
+    Этот тест создает пользователя, сохраняет его токен,
+    обновляет данные пользователя и проверяет, что токен
+    остается прежним и не создается новый.
+
+    :param user_data: данные пользователя для создания
+
+    """
+
+    user = User.objects.create_user(**user_data)
+
+    old_token = Token.objects.get(user=user)
+
+    user.username = "updateduser"
+    user.save()
+
+    assert Token.objects.count() == 1, "There should still be only one token for the user"
+    assert Token.objects.get(user=user) == old_token, "The token should remain the same after user update"
