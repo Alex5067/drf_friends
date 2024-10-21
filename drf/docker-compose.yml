@@ -1,12 +1,11 @@
-version: '3.8'
-
 services:
   web:
+    env_file: .env
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "${GUNICORN_PORT}:${GUNICORN_PORT}"
     volumes:
       - .:/app
     command: >
@@ -14,4 +13,5 @@ services:
       python manage.py makemigrations &&
       python manage.py migrate &&
       python manage.py collectstatic --noinput &&
-      python manage.py runserver 0.0.0.0:8000"
+      gunicorn drf.wsgi --bind ${GUNICORN_ADDRESS}:${GUNICORN_PORT}
+            "
