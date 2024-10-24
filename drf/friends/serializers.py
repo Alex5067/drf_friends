@@ -5,7 +5,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework.validators import UniqueValidator
 
-from .models import Friend, FriendRequest
+from .models import Friends, FriendRequest
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
@@ -127,7 +127,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """
         Возвращает список друзей пользователя.
         """
-        friends = Friend.objects.filter(current_user=obj).prefetch_related("users")
+        friends = Friends.objects.filter(current_user=obj).prefetch_related("users")
         return FriendSerializer(friends.first().users.all(), many=True).data if friends.exists() else []
 
     def get_friend_requests_sent(self, obj):

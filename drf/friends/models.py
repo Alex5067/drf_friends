@@ -26,14 +26,14 @@ class FriendRequest(models.Model):
 
         Этот метод создает или обновляет объект Friend для обоих пользователей, добавляя их друг к другу в друзья.
         """
-        friend, created = Friend.objects.get_or_create(current_user=self.from_user)
+        friend, created = Friends.objects.get_or_create(current_user=self.from_user)
         friend.users.add(self.to_user)
-        friend, created = Friend.objects.get_or_create(current_user=self.to_user)
+        friend, created = Friends.objects.get_or_create(current_user=self.to_user)
         friend.users.add(self.from_user)
         self.save()
 
 
-class Friend(models.Model):
+class Friends(models.Model):
     """
     Модель для представления списка друзей пользователя.
 
@@ -46,7 +46,7 @@ class Friend(models.Model):
     """
 
     users = models.ManyToManyField(User)
-    current_user = models.ForeignKey(User, related_name="owner", null=True, on_delete=models.CASCADE)
+    current_user = models.OneToOneField(User, related_name="owner", null=True, on_delete=models.CASCADE)
 
     @classmethod
     def lose_friend(cls, current_user, new_friend):

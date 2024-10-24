@@ -1,6 +1,6 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from friends.models import Friend, FriendRequest, User
+from friends.models import Friends, FriendRequest, User
 from friends.serializers import (
     AllUsersSerializer,
     FriendSerializer,
@@ -194,7 +194,7 @@ class SendRequestToUser(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        is_friend = Friend.objects.filter(current_user=request.user, users=friend)
+        is_friend = Friends.objects.filter(current_user=request.user, users=friend)
 
         if is_friend:
             return Response(f"{username} уже у вас в друзьях", status.HTTP_400_BAD_REQUEST)
@@ -359,11 +359,11 @@ class DeleteFriend(APIView):
         if username == str(current_user):
             return Response(f'{"Нельзя удалить самого себя из друзей"}', status.HTTP_400_BAD_REQUEST)
 
-        friend_relation = Friend.objects.filter(current_user=current_user, users=friend_to_lose)
+        friend_relation = Friends.objects.filter(current_user=current_user, users=friend_to_lose)
         if not friend_relation.exists():
             return Response(f"{username} не является вашим другом", status.HTTP_400_BAD_REQUEST)
 
         if friend_to_lose:
-            Friend.lose_friend(current_user, friend_to_lose)
-            Friend.lose_friend(friend_to_lose, current_user)
+            Friends.lose_friend(current_user, friend_to_lose)
+            Friends.lose_friend(friend_to_lose, current_user)
             return Response(f"Вы удалили {friend_to_lose} из друзей", status.HTTP_201_CREATED)
